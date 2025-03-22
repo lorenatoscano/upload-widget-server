@@ -4,15 +4,16 @@ import { fastify } from 'fastify'
 
 import { uploadImageRoute } from '@/infra/http/routes/upload-image'
 
+import fastifyMultipart from '@fastify/multipart'
+import fastifySwagger from '@fastify/swagger'
+import fastifySwaggerUi from '@fastify/swagger-ui'
 import {
   hasZodFastifySchemaValidationErrors,
   jsonSchemaTransform,
   serializerCompiler,
   validatorCompiler,
 } from 'fastify-type-provider-zod'
-import fastifySwagger from '@fastify/swagger'
-import fastifyMultipart from '@fastify/multipart'
-import fastifySwaggerUi from '@fastify/swagger-ui'
+import { transformSwaggerSchema } from './transform-swagger-schema'
 
 const server = fastify()
 
@@ -36,7 +37,6 @@ server.setErrorHandler((error, request, reply) => {
 
 server.register(fastifyCors, { origin: '*' })
 
-
 server.register(fastifyMultipart)
 server.register(fastifySwagger, {
   openapi: {
@@ -45,7 +45,7 @@ server.register(fastifySwagger, {
       version: '1.0.0',
     },
   },
-  transform: jsonSchemaTransform,
+  transform: transformSwaggerSchema,
 })
 
 server.register(fastifySwaggerUi, {
